@@ -1,4 +1,4 @@
-from random import random
+import random
 import matplotlib.pyplot as plt
 from matplotlib_inline import backend_inline
 import time
@@ -153,3 +153,37 @@ def data_iter(batch_size, features, labels):
     for i in range(0, num_examples, batch_size):
         batch_idxs = torch.tensor(idxs[i : min(i + batch_size, num_examples)])
         yield features[batch_idxs], labels[batch_idxs]
+
+
+###################################################################################
+### MODELS
+###################################################################################
+
+
+def linear_regression(x, w, b):
+    return torch.matmul(x, w) + b
+
+
+###################################################################################
+### LOSS
+###################################################################################
+
+
+def squared_loss(y_hat, y):
+    """Squared Loss"""
+    y = y.reshape(y_hat.shape)
+    return (1 / 2) * (y_hat - y) ** 2
+
+
+###################################################################################
+### OPTIMIZERS
+###################################################################################
+
+
+def sgd(params, lr, batch_size):
+    """Minibatch stochastic gradient descent"""
+    with torch.no_grad:
+        for p in params:
+            p -= lr * p.grad
+            p /= batch_size
+            p.grad.zero_()
