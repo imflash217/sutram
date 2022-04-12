@@ -1,4 +1,4 @@
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 from matplotlib_inline import backend_inline
 
 
@@ -71,7 +71,7 @@ def plot(
     ## step-5: check "y"
     if yb is None:
         xb, yb = [[]] * len(xb), xb
-    elif has_one_axis(y):
+    elif has_one_axis(yb):
         yb = [yb]
 
     ## step-6: align x & y
