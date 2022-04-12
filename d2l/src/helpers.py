@@ -182,8 +182,9 @@ def squared_loss(y_hat, y):
 
 def sgd(params, lr, batch_size):
     """Minibatch stochastic gradient descent"""
-    with torch.no_grad:
+    with torch.no_grad():
         for p in params:
-            p -= lr * p.grad
-            p /= batch_size
-            p.grad.zero_()
+            ## here we need to divide by "batch size"
+            ## because during forward prop, the gradient has accumulated for the mini-batch
+            p -= lr * p.grad / batch_size
+            p.grad.zero_()  ## zero the gradient
