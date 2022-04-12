@@ -1,5 +1,9 @@
 import matplotlib.pyplot as plt
 from matplotlib_inline import backend_inline
+import time
+import math
+import numpy as np
+import torch
 
 
 def use_svg_display():
@@ -90,3 +94,37 @@ def plot(
 
     ## step-9:
     set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
+
+
+###################################################################################
+### BENCHMARKING
+###################################################################################
+
+
+class Timer:
+    """Record multiple running times"""
+
+    def __init__(self):
+        self.times = []
+        self.start()
+
+    def start(self):
+        """Start the timer"""
+        self.tik = time.time()
+
+    def stop(self):
+        """Stop the timer"""
+        self.times.append(time.time() - self.tik)
+        return self.times[-1]
+
+    def avg(self):
+        """Return the average times"""
+        return sum(self.times) / len(self.times)
+
+    def sum(self):
+        """Return the sum of all times"""
+        return sum(self.times)
+
+    def cumsum(self):
+        """Return the accumulated time"""
+        return np.array(self.times).cumsum().tolist()
