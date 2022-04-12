@@ -1,3 +1,4 @@
+from random import random
 import matplotlib.pyplot as plt
 from matplotlib_inline import backend_inline
 import time
@@ -128,3 +129,27 @@ class Timer:
     def cumsum(self):
         """Return the accumulated time"""
         return np.array(self.times).cumsum().tolist()
+
+
+###################################################################################
+### DATA
+###################################################################################
+
+
+def synthetic_data(w, b, num_examples):
+    """Genrate y = Wx + b + noise"""
+    x = torch.normal(0, 1, (num_examples, len(w)))
+    y = torch.matmul(x, w) + b  ## y = x@w + b
+    y += torch.normal(0, 0.01, y.shape)  ## y = x@w + b + noise
+    return x, y.reshape((-1, 1))
+
+
+def data_iter(batch_size, features, labels):
+    """Iterate through the whole dataset consisting of (features, labels) with batch-wise random smapling"""
+    num_examples = len(features)
+    idxs = list(range(num_examples))
+    ## randomly sample from the indices
+    random.shuffle(idxs)
+    for i in range(0, num_examples, batch_size):
+        batch_idxs = torch.tensor(idxs[i : min(i + batch_size, num_examples)])
+        yield features[batch_idxs], labels[batch_idxs]
