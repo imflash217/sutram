@@ -8,6 +8,11 @@ import torch
 from torch.utils import data
 
 
+###################################################################################
+### VISUALIZATION
+###################################################################################
+
+
 def use_svg_display():
     """
     Use the SVG format to display plot in jupyter
@@ -96,6 +101,25 @@ def plot(
 
     ## step-9:
     set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
+
+
+def show_images(images, num_rows, num_cols, titles=None, scale=1.5):
+    """Plot a list of images"""
+    figsize = (num_cols * scale, num_rows * scale)
+    _, axes = plt.subplots(num_rows, num_cols, figsize=figsize)
+    axes = axes.flatten()
+    for i, (ax, img) in enumerate(zip(axes, images)):
+        if torch.is_tensor(img):
+            ## a tensor image....so convert it to numpy image
+            ax.imshow(img.numpy())
+        else:
+            ## a PIL image
+            ax.imshow(img)
+        ax.axes.get_xaxis().set_visible(False)
+        ax.axes.get_yaxis().set_visible(False)
+        if titles:
+            ax.set_title(titles[i])
+    return axes
 
 
 ###################################################################################
