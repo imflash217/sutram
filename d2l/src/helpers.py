@@ -345,7 +345,7 @@ def evaluate_ccuracy(model, data_iter):
 
 
 ###################################################################################
-### TRAINING / TESTING
+### TRAINING / TESTING / VALIDATION
 ###################################################################################
 
 
@@ -371,6 +371,34 @@ def train_epoch_ch3(model, train_dl, loss_fn, optimizer):
     train_loss = metric[0] / metric[2]
     train_acc = metric[1] / metric[2]
     return train_loss, train_acc
+
+
+def train_ch3(model, train_dl, test_dl, loss_fn, num_epochs, optimizer):
+    """Train a model defined in Chapter 3"""
+    animator = Animator(
+        xlabel="epoch",
+        xlim=[1, num_epochs],
+        ylim=[0.3, 0.9],
+        legend=["train_loss", "train_acc", "test_acc"],
+    )
+    for epoch in range(num_epochs):
+        train_metrics = train_epoch_ch3(model, train_dl, loss_fn, optimizer)
+        test_acc = evaluate_ccuracy(model, test_dl)
+        animator.add(epoch + 1, train_metrics + (test_acc,))
+    train_loss, train_acc = train_metrics
+    assert train_loss < 0.5, train_loss
+    assert train_acc <= 1 and train_acc > 0.7, train_acc
+    assert test_acc <= 1 and test_acc > 0.7, test_acc
+
+
+def predict_ch3(model, test_dl, n=6):
+    """Predict labels (defined in chapetr 3)"""
+    for X, y in test_dl:
+        break
+    trues = get_fashion_mnist_labels(y)
+    preds = get_fashion_mnist_labels(model(X).argmax(axis=1))
+    titles = [f"{true}\n{pred}" for true, pred in zip(trues, preds)]
+    show_images(X[0:n].reshape((n, 28, 28)), 1, n, titles=titles[:n])
 
 
 ###################################################################################
