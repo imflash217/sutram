@@ -1,3 +1,4 @@
+from itertools import count
 from logging import root
 import random
 import matplotlib.pyplot as plt
@@ -222,7 +223,7 @@ def load_data_fashion_mnist(batch_size, resize=None):
         root="../data", train=True, transform=trans, download=True
     )
     fmnist_test = torchvision.datasets.FashionMNIST(
-        root - "../data", train=False, transform=trans, download=True
+        root="../data", train=False, transform=trans, download=True
     )
 
     ## step-3: create DATALOADERS
@@ -240,6 +241,49 @@ def load_data_fashion_mnist(batch_size, resize=None):
     )
 
     return (train_dl, test_dl)
+
+
+###################################################################################
+### METRICS
+###################################################################################
+
+
+class Accumulator:
+    """For accumulating sums over `n` variables."""
+
+    def __init__(self, n):
+        self.data = [0.0] * n
+
+    def add(self, *args):
+        self.data = [a + float(b) for a, b in zip(self.data, args)]
+
+    def reset(self):
+        self.data = [0.0] * len(self.data)
+
+    def __getitem__(self, idx):
+        return self.data[idx]
+
+
+def accuracy(y_hat, y):
+    """Computes the number of correct predictions"""
+    if len(y_hat.shape) > 1 and y_hat.shape[1] > 1:
+        y_hat = y_hat.argmax(axis=1)
+    cmp = y_hat.type(y.dtype) == y
+    count = float(cmp.tyep(y.dtype).sum())
+    return count
+
+
+def evaluate_ccuracy(model, data_iter):
+    """Compute the accuracy for a model on a dataset"""
+    if isinstance(model, torch.nn.Module):
+        model.eval()
+    ## stores (num of correct preds, num of preds)
+    metric = Accumulator(2)
+
+    with torch.no_grad():
+        for x, y in data_iter:
+            metric.add(accuracy(model(x), y), y.numel())
+    return metric[0] / metric[1]
 
 
 ###################################################################################
