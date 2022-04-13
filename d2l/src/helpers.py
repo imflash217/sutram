@@ -5,6 +5,7 @@ import time
 import math
 import numpy as np
 import torch
+from torch.utils import data
 
 
 def use_svg_display():
@@ -153,6 +154,30 @@ def data_iter(batch_size, features, labels):
     for i in range(0, num_examples, batch_size):
         batch_idxs = torch.tensor(idxs[i : min(i + batch_size, num_examples)])
         yield features[batch_idxs], labels[batch_idxs]
+
+
+def load_array(data_arrays, batch_size, is_train=True):
+    """Construct a PyTorch data iterator"""
+    dataset = data.TensorDataset(*data_arrays)
+    return data.DataLoader(dataset, batch_size, shuffle=is_train)
+
+
+### FashionMNIST
+def get_fashion_mnist_labels(labels):
+    """Returns text labels for the FasshionMNIST dataset"""
+    text_labels = [
+        "t-shirt",
+        "trouser",
+        "pullover",
+        "dress",
+        "coat",
+        "sandal",
+        "shirt",
+        "sneaker",
+        "bag",
+        "ankle boot",
+    ]
+    return [text_labels[i] for i in labels]
 
 
 ###################################################################################
