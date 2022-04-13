@@ -287,6 +287,35 @@ def evaluate_ccuracy(model, data_iter):
 
 
 ###################################################################################
+### TRAINING / TESTING
+###################################################################################
+
+
+def train_epoch_ch3(model, train_dl, loss_fn, optimizer):
+    ## step-1: set the model in training mode
+    if isinstance(model, torch.nn.Module):
+        model.train()
+    ## step-2: create an accumulato ro hold results
+    metric = Accumulator(3)  ## (sum_of_train_loss, sum_of_train_acc, num_examples)
+
+    for xb, yb in train_dl:
+        preds = model(xb)  ## forward pass
+        loss = loss_fn(preds, yb)
+        if isinstance(optimizer, torch.optim.Optimizer):
+            optimizer.zero_grad()
+            loss.mean().backward()  ## backwrad pass
+            optimizer.step()
+        else:
+            ## using custom optimizer
+            loss.sum().backward()
+            optimizer(xb.shape[0])
+        metric.add(float(loss.sum()), accuracy(preds, yb), yb.numel())
+    train_loss = metric[0] / metric[2]
+    train_acc = metric[1] / metric[2]
+    return train_loss, train_acc
+
+
+###################################################################################
 ### MODELS
 ###################################################################################
 
