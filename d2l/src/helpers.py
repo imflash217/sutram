@@ -1,3 +1,4 @@
+from logging import root
 import random
 import matplotlib.pyplot as plt
 from matplotlib_inline import backend_inline
@@ -6,6 +7,8 @@ import math
 import numpy as np
 import torch
 from torch.utils import data
+import torchvision
+from torchvision import transforms
 
 
 ###################################################################################
@@ -186,7 +189,9 @@ def load_array(data_arrays, batch_size, is_train=True):
     return data.DataLoader(dataset, batch_size, shuffle=is_train)
 
 
+###
 ### FashionMNIST
+###
 def get_fashion_mnist_labels(labels):
     """Returns text labels for the FasshionMNIST dataset"""
     text_labels = [
@@ -202,6 +207,39 @@ def get_fashion_mnist_labels(labels):
         "ankle boot",
     ]
     return [text_labels[i] for i in labels]
+
+
+def load_data_fashion_mnist(batch_size, resize=None):
+    ## step-1: gather all transforms in order
+    trans = []
+    if resize:
+        trans.append(transforms.Resize(resize))
+    trans.append(transforms.ToTensor())
+    trans = transforms.Compose(trans)  ## compose the transforms in order
+
+    ## step-2: get the train and test DATASET
+    fmnist_train = torchvision.datasets.FashionMNIST(
+        root="../data", train=True, transform=trans, download=True
+    )
+    fmnist_test = torchvision.datasets.FashionMNIST(
+        root - "../data", train=False, transform=trans, download=True
+    )
+
+    ## step-3: create DATALOADERS
+    train_dl = torch.utils.data.DataLoader(
+        fmnist_train,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=get_dataloader_workers(),
+    )
+    test_dl = torch.utils.data.DataLoader(
+        fmnist_test,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=get_dataloader_workers(),
+    )
+
+    return (train_dl, test_dl)
 
 
 ###################################################################################
@@ -237,3 +275,13 @@ def sgd(params, lr, batch_size):
             ## because during forward prop, the gradient has accumulated for the mini-batch
             p -= lr * p.grad / batch_size
             p.grad.zero_()  ## zero the gradient
+
+
+###################################################################################
+### CUDA / Kernels / Speedup /
+###################################################################################
+
+
+def get_dataloader_workers():
+    """Use 4 processes to read the data"""
+    return 4
