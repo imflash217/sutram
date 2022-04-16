@@ -1,17 +1,14 @@
-from itertools import count
-from logging import root
 import random
-import matplotlib.pyplot as plt
-from matplotlib_inline import backend_inline
-from IPython import display
 import time
-import math
+
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from torch.utils import data
 import torchvision
+from IPython import display
+from matplotlib_inline import backend_inline
+from torch.utils import data
 from torchvision import transforms
-
 
 ###################################################################################
 ### VISUALIZATION
